@@ -4,7 +4,7 @@ const connectToDatabase = require('../database/db');
 exports.getPosts = async (req, res) => {
    try {
       const pool = await connectToDatabase();
-      const result = await pool.request().query("SELECT post_id, user_id, content, created_at FROM post");
+      const result = await pool.request().query("SELECT post_id, user_id, content, created_at FROM posts");
       res.json({ message: result.recordset });
    } catch (error) {
       res.json({ message: error.message });
