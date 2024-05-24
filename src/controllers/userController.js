@@ -34,11 +34,11 @@ exports.addUser = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-   const { username, password } = req.body;
+   const { email, password } = req.body;
 
    try {
-      if (!username || !password) {
-         throw new Error("Username or password is missing in the request body");
+      if (!email || !password) {
+         throw new Error("Email or password is missing in the request body");
       }
 
       // Hash het ingevoerde wachtwoord voordat je het vergelijkt
@@ -46,18 +46,18 @@ exports.login = async (req, res) => {
 
       const pool = await connectToDatabase();
       const result = await pool.request()
-         .input('username', sql.VarChar, username)
-         .input('password', sql.VarChar, hashedPassword) // Vergelijking met het gehashte wachtwoord in de database
-         .query('SELECT * FROM users WHERE username = @username AND password = @password');
+         .input('email', sql.VarChar, email)
+         .input('password', sql.VarChar, hashedPassword)
+         .query('SELECT * FROM users WHERE email = @email AND password = @password');
 
       if (result.recordset.length > 0) {
          // Gebruiker gevonden, authenticatie gelukt
          const user = result.recordset[0];
-         const token = jwt.sign({ userId: user.id, username: user.username, email: user.email }, 'jwt_secret_key');
+         const token = jwt.sign({ userId: user.user_id, username: user.username, email: user.email }, 'jwt_secret_key');
          res.json({ token });
       } else {
          // Gebruiker niet gevonden of wachtwoord onjuist
-         res.status(401).json({ message: "Invalid username or password" });
+         res.status(401).json({ message: "Invalid email or password" });
       }
    } catch (error) {
       console.error("Login error:", error);

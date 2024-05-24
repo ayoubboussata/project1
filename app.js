@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const bodyParser = require('body-parser');
 const userRoutes = require('./src/routes/userRoutes');
 const postRoutes = require('./src/routes/postRoutes');
@@ -6,7 +7,12 @@ const postRoutes = require('./src/routes/postRoutes');
 const app = express(); // Move this line to the top
 const port = process.env.PORT || 3000;
 
-app.use(express.static('public'));
+const corsOptions = {
+   origin: 'https://loginpg.onrender.com',
+   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+
+app.use(cors(corsOptions));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
