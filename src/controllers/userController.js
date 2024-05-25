@@ -17,15 +17,26 @@ exports.addUser = async (req, res) => {
    const { username, pwd, email } = req.body;
 
    try {
-      // Hash het wachtwoord voordat je het opslaat
+      // Check if email already exists
+      const pool = await connectToDatabase();
+      const emailCheckResult = await pool.request()
+         .input('email', sql.VarChar, email)
+         .query('SELECT * FROM users WHERE email = @email');
+
+      if (emailCheckResult.recordset.length > 0) {
+         res.status(400).json({ message: "Email already exists" });
+         return;
+      }
+
+      // Hash the password before saving it
       const hashedPassword = crypto.createHash('sha256').update(pwd).digest('hex');
 
-      const pool = await connectToDatabase();
       await pool.request()
          .input('username', sql.VarChar, username)
-         .input('pwd', sql.VarChar, hashedPassword) // Opslaan van het gehashte wachtwoord
+         .input('pwd', sql.VarChar, hashedPassword) // Save the hashed password
          .input('email', sql.VarChar, email)
          .query('INSERT INTO users (username, password, email) VALUES (@username, @pwd, @email)');
+      
       res.json({ message: "Data added successfully" });
    } catch (error) {
       console.error("Add user error:", error);
