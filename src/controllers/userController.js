@@ -24,16 +24,15 @@ exports.addUser = async (req, res) => {
          .query('SELECT * FROM users WHERE email = @email');
 
       if (emailCheckResult.recordset.length > 0) {
-         res.status(400).json({ message: "Email already exists" });
+         res.status(400).json({ message: "Email already existss" });
          return;
       }
 
-      // Hash the password before saving it
       const hashedPassword = crypto.createHash('sha256').update(pwd).digest('hex');
 
       await pool.request()
          .input('username', sql.VarChar, username)
-         .input('pwd', sql.VarChar, hashedPassword) // Save the hashed password
+         .input('pwd', sql.VarChar, hashedPassword) 
          .input('email', sql.VarChar, email)
          .query('INSERT INTO users (username, password, email) VALUES (@username, @pwd, @email)');
       
